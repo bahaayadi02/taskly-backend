@@ -1,0 +1,44 @@
+// MongoDB script to update existing workers
+// Run this in MongoDB Compass or mongosh
+
+// 1. Add 'work' field to existing worker "John" (Electrician)
+db.users.updateOne(
+  { email: "john@test.com" },
+  { 
+    $set: { 
+      work: "Electrician",
+      address: "Mateur",
+      latitude: 37.0403,
+      longitude: 9.6658
+    } 
+  }
+);
+
+// 2. Add 'work' field to existing worker "baha" (if they're a worker)
+db.users.updateOne(
+  { email: "baha@baha.com", role: "worker" },
+  { 
+    $set: { 
+      work: "Plumber",
+      address: "Tunis",
+      latitude: 36.8065,
+      longitude: 10.1815
+    } 
+  }
+);
+
+// 3. Verify all workers (set isEmailVerified to true)
+db.users.updateMany(
+  { role: "worker" },
+  { $set: { isEmailVerified: true } }
+);
+
+// 4. Check the results
+db.users.find({ role: "worker" }).pretty();
+
+// 5. Count workers by service
+db.users.aggregate([
+  { $match: { role: "worker", isEmailVerified: true } },
+  { $group: { _id: "$work", count: { $sum: 1 } } },
+  { $sort: { count: -1 } }
+]);
