@@ -427,8 +427,9 @@ export class AuthService {
     user.emailVerificationCodeExpires = undefined;
     await user.save();
 
-    // Send welcome email
-    await this.emailService.sendWelcomeEmail(user.email, user.fullName, user.role);
+    // Send welcome email (non-blocking to avoid timeout)
+    this.emailService.sendWelcomeEmail(user.email, user.fullName, user.role)
+      .catch(err => console.error('Failed to send welcome email:', err));
 
     // Generate JWT token
     const payload = { sub: user._id, email: user.email, role: user.role };
@@ -478,8 +479,9 @@ export class AuthService {
     user.emailVerificationCodeExpires = verificationExpires;
     await user.save();
 
-    // Send verification email
-    await this.emailService.sendEmailVerificationCode(email, verificationCode, user.fullName);
+    // Send verification email (non-blocking to avoid timeout)
+    this.emailService.sendEmailVerificationCode(email, verificationCode, user.fullName)
+      .catch(err => console.error('Failed to send verification email:', err));
 
     return {
       message: 'Verification code sent to your email',
@@ -512,8 +514,9 @@ export class AuthService {
     user.passwordResetCodeExpires = resetExpires;
     await user.save();
 
-    // Send password reset email
-    await this.emailService.sendPasswordResetCode(email, resetCode, user.fullName);
+    // Send password reset email (non-blocking to avoid timeout)
+    this.emailService.sendPasswordResetCode(email, resetCode, user.fullName)
+      .catch(err => console.error('Failed to send password reset email:', err));
 
     return {
       message: 'Password reset code sent to your email',
