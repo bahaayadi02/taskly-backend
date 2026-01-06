@@ -73,8 +73,9 @@ export class AuthService {
 
         await existingUser.save();
 
-        // Send verification email
-        await this.emailService.sendEmailVerificationCode(email, verificationCode, fullName);
+        // Send verification email (non-blocking to avoid timeout)
+        this.emailService.sendEmailVerificationCode(email, verificationCode, fullName)
+          .catch(err => console.error('Failed to send verification email:', err));
 
         return {
           message: 'Verification code sent to your email. Please verify your account.',
@@ -111,8 +112,9 @@ export class AuthService {
 
     await user.save();
 
-    // Send verification email
-    await this.emailService.sendEmailVerificationCode(email, verificationCode, fullName);
+    // Send verification email (non-blocking to avoid timeout)
+    this.emailService.sendEmailVerificationCode(email, verificationCode, fullName)
+      .catch(err => console.error('Failed to send verification email:', err));
 
     return {
       message: 'Registration successful! Please check your email for verification code.',
